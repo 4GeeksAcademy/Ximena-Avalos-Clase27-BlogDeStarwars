@@ -1,3 +1,6 @@
+import characterImages from '../data/characterImages.json';
+import planetImages from '../data/planetImages.json';
+
 const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
@@ -5,7 +8,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             character: null,
             planets: [],
             planet: null,
-            favorites: [], 
+            favorites: [],
         },
         actions: {
             loadCharacters: async () => {
@@ -15,6 +18,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const charactersData = await Promise.all(data.results.map(async (character) => {
                         const characterResponse = await fetch(character.url);
                         const characterDetails = await characterResponse.json();
+                        const imageUrl = characterImages[characterDetails.result.properties.name] || 'https://via.placeholder.com/400x200';
+
                         return {
                             name: characterDetails.result.properties.name,
                             gender: characterDetails.result.properties.gender,
@@ -26,7 +31,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             birthYear: characterDetails.result.properties.birth_year,
                             homeworld: characterDetails.result.properties.homeworld,
                             url: characterDetails.result.properties.url,
-                            imageUrl: 'https://via.placeholder.com/400x200',
+                            imageUrl: imageUrl,
                             description: characterDetails.result.description,
                             _id: characterDetails.result._id,
                             uid: characterDetails.result.uid,
@@ -47,6 +52,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const planetsData = await Promise.all(data.results.map(async (planet) => {
                         const planetResponse = await fetch(planet.url);
                         const planetDetails = await planetResponse.json();
+                        const imageUrl = planetImages[planetDetails.result.properties.name] || 'https://via.placeholder.com/400x200';
+
                         return {
                             name: planetDetails.result.properties.name,
                             population: planetDetails.result.properties.population,
@@ -57,7 +64,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             climate: planetDetails.result.properties.climate,
                             surfaceWater: planetDetails.result.properties.surface_water,
                             gravity: planetDetails.result.properties.gravity,
-                            imageUrl: 'https://via.placeholder.com/400x200',
+                            imageUrl: imageUrl,
                             description: planetDetails.result.description,
                             _id: planetDetails.result._id,
                             uid: planetDetails.result.uid,
@@ -75,6 +82,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const response = await fetch(`https://www.swapi.tech/api/people/${uid}`);
                     const data = await response.json();
+                    const imageUrl = characterImages[data.result.properties.name] || 'https://via.placeholder.com/800x600';
                     const characterDetails = {
                         name: data.result.properties.name,
                         gender: data.result.properties.gender,
@@ -86,7 +94,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         birthYear: data.result.properties.birth_year,
                         homeworld: data.result.properties.homeworld,
                         url: data.result.properties.url,
-                        imageUrl: 'https://via.placeholder.com/800x600',
+                        imageUrl: imageUrl,
                         description: data.result.description,
                         _id: data.result._id,
                         uid: data.result.uid,
@@ -103,6 +111,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const response = await fetch(`https://www.swapi.tech/api/planets/${uid}`);
                     const data = await response.json();
+                    const imageUrl = planetImages[data.result.properties.name] || 'https://via.placeholder.com/800x600';
                     const planetDetails = {
                         name: data.result.properties.name,
                         population: data.result.properties.population,
@@ -113,7 +122,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         climate: data.result.properties.climate,
                         surfaceWater: data.result.properties.surface_water,
                         gravity: data.result.properties.gravity,
-                        imageUrl: 'https://via.placeholder.com/800x600',
+                        imageUrl: imageUrl,
                         description: data.result.description,
                         _id: data.result._id,
                         uid: data.result.uid,
@@ -126,12 +135,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Error fetching planet details:", error);
                 }
             },
-                 addFavorite: item => {
+            addFavorite: (item) => {
                 const store = getStore();
                 const updatedFavorites = [...store.favorites, item];
                 setStore({ favorites: updatedFavorites });
             },
-            removeFavorite: uid => {
+            removeFavorite: (uid) => {
                 const store = getStore();
                 const updatedFavorites = store.favorites.filter(favorite => favorite.uid !== uid);
                 setStore({ favorites: updatedFavorites });
