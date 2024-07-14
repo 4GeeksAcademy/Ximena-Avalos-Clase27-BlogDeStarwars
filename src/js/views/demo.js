@@ -1,43 +1,58 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
-
-import { Context } from "../store/appContext";
-
-import "../../styles/demo.css";
+import React, { useContext, useEffect } from 'react';
+import { Context } from '../store/appContext';
+import { ItemCard } from '../component/itemCard';
+import { useNavigate } from 'react-router-dom';
 
 export const Demo = () => {
-	const { store, actions } = useContext(Context);
+  const { store, actions } = useContext(Context);
+  const navigate = useNavigate();
 
-	return (
-		<div className="container">
-			<ul className="list-group">
-				{store.demo.map((item, index) => {
-					return (
-						<li
-							key={index}
-							className="list-group-item d-flex justify-content-between"
-							style={{ background: item.background }}>
-							<Link to={"/single/" + index}>
-								<span>Link to: {item.title}</span>
-							</Link>
-							{// Conditional render example
-							// Check to see if the background is orange, if so, display the message
-							item.background === "orange" ? (
-								<p style={{ color: item.initial }}>
-									Check store/flux.js scroll to the actions to see the code
-								</p>
-							) : null}
-							<button className="btn btn-success" onClick={() => actions.changeColor(index, "orange")}>
-								Change Color
-							</button>
-						</li>
-					);
-				})}
-			</ul>
-			<br />
-			<Link to="/">
-				<button className="btn btn-primary">Back home</button>
-			</Link>
-		</div>
-	);
+  useEffect(() => {
+    if (store.characters.length === 0) {
+      actions.loadCharacters();
+    }
+    if (store.planets.length === 0) {
+      actions.loadPlanets();
+    }
+  }, []);
+
+  const handleLearnMoreCharacter = (uid) => {
+    navigate(`/character_details/${uid}`);
+  };
+
+  const handleLearnMorePlanet = (uid) => {
+    navigate(`/planet_details/${uid}`);
+  };
+
+  return (
+    <div className="container">
+      <h2 className="my-4">Characters</h2>
+      <div className="row">
+        {store.characters.length > 0 ? store.characters.map((character, index) => (
+          <ItemCard
+            key={index}
+            name={character.name}
+            gender={character.gender}
+            hairColor={character.hairColor}
+            eyeColor={character.eyeColor}
+            imageUrl={character.imageUrl}
+            onLearnMore={() => handleLearnMoreCharacter(character.uid)}
+          />
+        )) : <p>Loading characters...</p>}
+      </div>
+      <h2 className="my-4">Planets</h2>
+      <div className="row">
+        {store.planets.length > 0 ? store.planets.map((planet, index) => (
+          <ItemCard
+            key={index}
+            name={planet.name}
+            population={planet.population}
+            terrain={planet.terrain}
+            imageUrl={planet.imageUrl}
+            onLearnMore={() => handleLearnMorePlanet(planet.uid)}
+          />
+        )) : <p>Loading planets...</p>}
+      </div>
+    </div>
+  );
 };
